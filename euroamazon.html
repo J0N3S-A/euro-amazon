@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>متجر الدار - للأجهزة المنزلية وأدوات المطبخ</title>
+  <!-- خطوط جوجل ونظام الأيقونات -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* الألوان والتصميم مستوحى من دفء وأناقة المطابخ الحديثة (ألوان ترابية دافئة مع برتقالي/ذهبي خافت ونظافة الأبيض) */
+    :root {
+      --primary-color: #d97706; /* لون برتقالي دافئ/خردلي للأجهزة والأدوات */
+      --secondary-color: #1e293b; /* كحلي غامق وفخم للخلفيات والنصوص */
+      --bg-color: #fcfbf9; /* أبيض دافئ ومريح للعين */
+      --card-bg: #ffffff;
+      --text-color: #334155;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    /* الهيدر (شريط التنقل) */
+    header {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 15px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      border: 1px solid white;
+    }
+
+    /* الحاويات الرئيسية */
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* لوحة تحكم المدير (تخفى تلقائياً وتظهر للمدير فقط) */
+    #admin-panel {
+      background-color: #fef3c7;
+      border: 1px solid #f59e0b;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      display: none; /* مخفي افتراضياً */
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+    }
+
+    /* الأقسام (Categories) */
+    .categories-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .category-chip {
+      background-color: white;
+      border: 1px solid var(--border-color);
+      padding: 8px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .category-chip.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* شبكة المنتجات */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      transition: 0.3s;
+      position: relative;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background-color: #f1f5f9;
+    }
+
+    .product-info {
+      padding: 15px;
+    }
+
+    .product-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .product-price {
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    /* زر التعديل الخاص بالمدير فقط داخل كرت المنتج */
+    .admin-edit-btn {
+      background-color: #ef4444;
+      margin-top: 5px;
+      width: 100%;
+      display: none; /* يخفى ويظهر بالكود للمدير */
+    }
+
+    /* السلة والطلبات */
+    #cart-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-top: 40px;
+      display: none;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- الهيدر -->
+  <header>
+    <div class="logo"><i class="fa-solid fa-blender"></i> متجر الدار للأجهزة</div>
+    <div class="nav-buttons">
+      <span id="user-welcome"></span>
+      <button id="btn-login" onclick="handleAuth()"><i class="fa-solid fa-user"></i> تسجيل الدخول</button>
+      <button id="btn-cart-toggle" onclick="toggleCart()" style="display:none;"><i class="fa-solid fa-basket-shopping"></i> السلة (<span id="cart-count">0</span>)</button>
+      <button id="btn-logout" onclick="logout()" style="display:none; background-color:#64748b;">خروج</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- لوحة تحكم المدير (تظهر فقط إذا كان الحساب Admin) -->
+    <section id="admin-panel">
+      <h3><i class="fa-solid fa-sliders"></i> لوحة تحكم المدير (إضافة وتعديل البيانات)</h3>
+      <br>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- نموذج الأقسام -->
+        <div style="border-left: 1px solid #f59e0b; padding-left: 20px;">
+          <h4>إضافة قسم جديد (Category)</h4>
+          <div class="form-group">
+            <input type="text" id="new-category-name" placeholder="مثال: أدوات طبخ، ثلاجات، خلاطات...">
+            <button onclick="addNewCategory()">حفظ القسم</button>
+          </div>
+        </div>
+        <!-- نموذج المنتجات -->
+        <div>
+          <h4>إضافة / تعديل منتج</h4>
+          <input type="hidden" id="edit-product-id">
+          <div class="form-group">
+            <input type="text" id="prod-title" placeholder="اسم الجهاز / الأداة">
+            <input type="number" id="prod-price" placeholder="السعر">
+            <input type="text" id="prod-img" placeholder="رابط صورة المنتج">
+            <select id="prod-category">
+              <!-- يتم تعبئتها ديناميكياً من قاعدة البيانات -->
+            </select>
+            <button id="btn-save-product" onclick="saveProduct()">حفظ المنتج</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- شريط تصفح الأقسام (Categories) -->
+    <h2>تصفح الأقسام</h2>
+    <div class="categories-bar" id="categories-container">
+      <div class="category-chip active" onclick="loadProducts('all')">الكل</div>
+    </div>
+
+    <!-- شبكة عرض المنتجات -->
+    <h2 style="margin-bottom: 20px;">منتجاتنا المتميزة</h2>
+    <div class="products-grid" id="products-container">
+      <!-- المنتجات تظهر هنا تلقائياً -->
+    </div>
+
+    <!-- قسم السلة والطلبات -->
+    <section id="cart-section">
+      <h3><i class="fa-solid fa-cart-shopping"></i> سلة المشتريات والطلبات</h3>
+      <div id="cart-items-container" style="margin: 20px 0;">
+        <!-- عناصر السلة تظهر هنا -->
+      </div>
+      <div style="text-align: left;">
+        <button onclick="confirmOrder()" style="background-color: #10b981; font-size: 18px;">تأكيد وطلب الشراء الفوري</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ربط حزم Firebase (v10+) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, getDoc, doc, setDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // إعدادات الكونسول الخاصة بك التي أرسلتها لي
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-jSjjX6EWuH3PEgKH_r2vd0NWwNEabzU",
+      authDomain: "euro-2e7b8.firebaseapp.com",
+      projectId: "euro-2e7b8",
+      storageBucket: "euro-2e7b8.firebasestorage.app",
+      messagingSenderId: "794828600866",
+      appId: "1:794828600866:web:1017fdf959238a9c487c7b",
+      measurementId: "G-MNJQ5BNGPY"
+    };
+
+    // تهيئة الـ SDK
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // متغيرات لحفظ حالة المستخدم الحالي وصلاحيته
+    let currentUser = null;
+    let currentUserRole = "guest"; 
+
+    // --- 1. نظام مراقبة حالة المستخدم والتحقق من الصلاحيات ---
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        
+        // جلب وثيقة المستخدم لمعرفة الدور (Role)
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          currentUserRole = userDoc.data().role;
+        } else {
+          // إذا كان مسجلاً جديداً، نطلب منه رقم الهاتف لإتمام تسجيله
+          let phone = prompt("لتأكيد هويتك وإتمام عملية التسجيل، يرجى إدخال رقم الهاتف الخاص بك:");
+          if(!phone) {
+             alert("لا يمكن التسجيل بدون رقم هاتف، سيتم تسجيل خروجك.");
+             signOut(auth);
+             return;
+          }
+          // حفظ بياناته الجديدة بالدور الافتراضي (customer)
+          currentUserRole = "customer";
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            phoneNumber: phone,
+            role: "customer"
+          });
+        }
+
+        // تحديث عناصر الواجهة بناءً على الصلاحيات
+        document.getElementById("user-welcome").innerText = `مرحباً، ${user.displayName} (${currentUserRole == 'admin' ? 'المدير' : 'عميل'})`;
+        document.getElementById("btn-login").style.display = "none";
+        document.getElementById("btn-logout").style.display = "block";
+        document.getElementById("btn-cart-toggle").style.display = "block";
+
+        // إذا كان المالك أو المدير (Admin) تظهر له لوحة الإدارة فوراً في نفس الصفحة
+        if (currentUserRole === "admin") {
+          document.getElementById("admin-panel").style.display = "block";
+        }
+        
+        updateCartCount();
+      } else {
+        // ضيف أو غير مسجل
+        currentUser = null;
+        currentUserRole = "guest";
+        document.getElementById("user-welcome").innerText = "";
+        document.getElementById("btn-login").style.display = "block";
+        document.getElementById("btn-logout").style.display = "none";
+        document.getElementById("btn-cart-toggle").style.display = "none";
+        document.getElementById("admin-panel").style.display = "none";
+      }
+      // إعادة تحميل المنتجات لعرض أو إخفاء أزرار التعديل بناءً على الرتبة الجديدة
+      loadCategories();
+      loadProducts('all');
+    });
+
+    // تسجيل الدخول بجوجل
+    window.handleAuth = async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("فشل تسجيل الدخول: " + error.message);
+      }
+    };
+
+    // تسجيل الخروج
+    window.logout = () => {
+      signOut(auth);
+      window.location.reload();
+    };
+
+    // --- 2. إدارة الأقسام والمنتجات (المدير فقط) ---
+    
+    // جلب الأقسام وعرضها في شريط التصفح وفي القائمة المنسدلة للنموذج
+    async function loadCategories() {
+      const querySnapshot = await getDocs(collection(db, "categories"));
+      const container = document.getElementById("categories-container");
+      const select = document.getElementById("prod-category");
+      
+      container.innerHTML = `<div class="category-chip active" onclick="loadProducts('all')">الكل</div>`;
+      select.innerHTML = "";
+
+      querySnapshot.forEach((doc) => {
+        const cat = doc.data();
+        // شريط التصفح
+        container.innerHTML += `<div class="category-chip" onclick="loadProducts('${doc.id}')">${cat.name}</div>`;
+        // قائمة الاختيار عند الإضافة
+        select.innerHTML += `<option value="${doc.id}">${cat.name}</option>`;
+      });
+    }
+
+    // إضافة قسم جديد (للمدير)
+    window.addNewCategory = async () => {
+      if(currentUserRole !== "admin") return alert("غير مصرح لك!");
+      const name = document.getElementById("new-category-name").value;
+      if(!name) return alert("اكتب اسم القسم");
+
+      await addDoc(collection(db, "categories"), { name: name });
+      alert("تمت إضافة القسم بنجاح!");
+      document.getElementById("new-category-name").value = "";
+      loadCategories();
+    };
+
+    // إضافة أو تعديل منتج (للمدير)
+    window.saveProduct = async () => {
+      if(currentUserRole !== "admin") return alert("غير مصرح لك!");
+      
+      const id = document.getElementById("edit-product-id").value;
+      const title = document.getElementById("prod-title").value;
+      const price = document.getElementById("prod-price").value;
+      const imageUrl = document.getElementById("prod-img").value;
+      const categoryId = document.getElementById("prod-category").value;
+
+      const productData = { title, price: Number(price), imageUrl, categoryId };
+
+      if(id) {
+        // عملية تعديل لمنتج قائم
+        await updateDoc(doc(db, "products", id), productData);
+        alert("تم تعديل المنتج!");
+      } else {
+        // عملية إضافة منتج جديد
+        await addDoc(collection(db, "products"), productData);
+        alert("تم إضافة المنتج بنجاح!");
+      }
+
+      // تنظيف النموذج وإعادة التحميل
+      document.getElementById("edit-product-id").value = "";
+      document.getElementById("prod-title").value = "";
+      document.getElementById("prod-price").value = "";
+      document.getElementById("prod-img").value = "";
+      loadProducts('all');
+    };
+
+    // دالة تعبئة النموذج عند ضغط المدير على "تعديل البيانات"
+    window.fillEditForm = (id, title, price, imageUrl, categoryId) => {
+      document.getElementById("edit-product-id").value = id;
+      document.getElementById("prod-title").value = title;
+      document.getElementById("prod-price").value = price;
+      document.getElementById("prod-img").value = imageUrl;
+      document.getElementById("prod-category").value = categoryId;
+      window.scrollTo({top: 0, behavior: 'smooth'}); // الصعود للأعلى للوحة التحكم
+    };
+
+
+    // --- 3. عرض المنتجات والتصفية (للجميع والمميزات للمدير) ---
+    window.loadProducts = async (catId) => {
+      let q = collection(db, "products");
+      if(catId !== 'all') {
+        q = query(collection(db, "products"), where("categoryId", "==", catId));
+      }
+
+      const querySnapshot = await getDocs(q);
+      const container = document.getElementById("products-container");
+      container.innerHTML = "";
+
+      querySnapshot.forEach((docSnap) => {
+        const prod = docSnap.data();
+        const prodId = docSnap.id;
+
+        // التحقق ديناميكياً: هل يظهر زر التعديل؟ (فقط لو كان admin)
+        const displayAdminBtn = (currentUserRole === 'admin') ? 'block' : 'none';
+        // زر السلة يظهر للمستخدم العادي والمسجلين
+        const displayUserBtn = (currentUserRole !== 'admin' && currentUserRole !== 'guest') ? 'block' : 'none';
+
+        container.innerHTML += `
+          <div class="product-card">
+            <img class="product-img" src="${prod.imageUrl || 'https://via.placeholder.com/300x220?text=No+Image'}" alt="${prod.title}">
+            <div class="product-info">
+              <div class="product-title">${prod.title}</div>
+              <div class="product-price">${prod.price} د.ع</div>
+              
+              <!-- زر للمستخدم العادي -->
+              <button style="display:${displayUserBtn}; width:100%;" onclick="addToCart('${prodId}', '${prod.title}', ${prod.price})">
+                <i class="fa-solid fa-cart-plus"></i> إضافة للسلة
+              </button>
+
+              <!-- أزرار تظهر للمدير فقط للتعديل الفوري -->
+              <button class="admin-edit-btn" style="display:${displayAdminBtn}; background-color:#d97706;" 
+                onclick="fillEditForm('${prodId}', '${prod.title}', ${prod.price}, '${prod.imageUrl}', '${prod.categoryId}')">
+                <i class="fa-solid fa-pen-to-square"></i> تعديل بيانات المنتج
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    };
+
+    // --- 4. إدارة السلة وعمليات الشراء والطلبات ---
+    window.addToCart = async (prodId, title, price) => {
+      if(!currentUser) return alert("الرجاء تسجيل الدخول أولاً");
+      
+      await addDoc(collection(db, "carts"), {
+        userId: currentUser.uid,
+        userName: currentUser.displayName,
+        productId: prodId,
+        title: title,
+        price: price,
+        status: "pending" // معلق في السلة
+      });
+      alert("تمت إضافة القطعة إلى سلتك!");
+      updateCartCount();
+    };
+
+    async function updateCartCount() {
+      if(!currentUser) return;
+      const q = query(collection(db, "carts"), where("userId", "==", currentUser.uid), where("status", "==", "pending"));
+      const snap = await getDocs(q);
+      document.getElementById("cart-count").innerText = snap.size;
+    }
+
+    window.toggleCart = async () => {
+      const cartSec = document.getElementById("cart-section");
+      if(cartSec.style.display === "block") {
+        cartSec.style.display = "none";
+        return;
+      }
+      cartSec.style.display = "block";
+
+      let q;
+      // المدير ومسؤول المبيعات يرى كل الطلبات لجميع المستخدمين، المستخدم يرى منتجاته فقط
+      if(currentUserRole === "admin" || currentUserRole === "sales_manager") {
+        q = collection(db, "carts");
+      } else {
+        q = query(collection(db, "carts"), where("userId", "==", currentUser.uid));
+      }
+
+      const snap = await getDocs(q);
+      const container = document.getElementById("cart-items-container");
+      container.innerHTML = "";
+
+      if(snap.empty) {
+        container.innerHTML = "<p>السلة فارغة حالياً.</p>";
+        return;
+      }
+
+      snap.forEach((doc) => {
+        const item = doc.data();
+        container.innerHTML += `
+          <div class="cart-item">
+            <span><strong>${item.title}</strong> (${item.price} د.ع) ${currentUserRole === 'admin' ? ` - طلب من: ${item.userName}` : ''}</span>
+            <span style="color: ${item.status === 'ordered' ? 'green' : 'orange'}">
+              ${item.status === 'ordered' ? '✓ تم الطلب' : '⏳ في السلة'}
+            </span>
+          </div>
+        `;
+      });
+    };
+
+    // عند قيام المستخدم بضغط "تأكيد الطلب الفوري"
+    window.confirmOrder = async () => {
+      const q = query(collection(db, "carts"), where("userId", "==", currentUser.uid), where("status", "==", "pending"));
+      const snap = await getDocs(q);
+      
+      if(snap.empty) return alert("لا توجد منتجات معلقة في السلة لطلبها!");
+
+      // تحديث حالة المنتجات من معلق في السلة إلى تم الطلب بنجاح لكي يراها مدير المبيعات والمدير
+      snap.forEach(async (item) => {
+        await updateDoc(doc(db, "carts", item.id), { status: "ordered" });
+      });
+
+      alert("تم إرسال طلبك بنجاح للمدير ومسؤولي المبيعات!");
+      updateCartCount();
+      toggleCart();
+    };
+
+  </script>
+</body>
+</html>
