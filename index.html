@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>متجر الدار - للأجهزة المنزلية وأدوات المطبخ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
-      --primary-color: #d97706; 
-      --secondary-color: #1e293b; 
-      --bg-color: #fcfbf9; 
+      --primary-color: #d97706; /* لون برتقالي دافئ/خردلي للأجهزة والأدوات */
+      --secondary-color: #1e293b; /* كحلي غامق وفخم للخلفيات والنصوص */
+      --bg-color: #fcfbf9; /* أبيض دافئ ومريح للعين */
       --card-bg: #ffffff;
       --text-color: #334155;
       --border-color: #e2e8f0;
@@ -38,7 +38,7 @@
 
     .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
 
-    /* نافذة إكمال البيانات للمستخدم الجديد */
+    /* نافذة إكمال البيانات للمييزين الجدد */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center;
@@ -78,6 +78,7 @@
 </head>
 <body>
 
+  <!-- الهيدر -->
   <header>
     <div class="logo"><i class="fa-solid fa-kitchen-set"></i> متجر الدار للأجهزة</div>
     <div class="nav-buttons">
@@ -88,13 +89,14 @@
     </div>
   </header>
 
+  <!-- نافذة إكمال بيانات التوصيل (تظهر بعد تسجيل الجيميل والموثق للمرة الأولى) -->
   <div class="modal" id="info-modal">
     <div class="modal-content">
       <h3 style="margin-bottom: 15px; color: var(--secondary-color);"><i class="fa-solid fa-address-card"></i> إكمال معلومات الحساب</h3>
       <p style="font-size: 14px; margin-bottom: 15px; color: #64748b;">يرجى تزويدنا بتفاصيل التوصيل لإتمام عملية التسجيل في المتجر.</p>
       
       <div class="form-group">
-        <label>رقم الهاتف (11 رقم - مثل 07XXXXXXXXX) *</label>
+        <label>رقم الهاتف العراقي (11 رقم - مثل 07XXXXXXXXX) *</label>
         <input type="tel" id="user-phone" placeholder="أدخل 11 رقماً" maxlength="11">
       </div>
       <div class="form-group">
@@ -107,6 +109,7 @@
 
   <div class="container">
 
+    <!-- لوحة تحكم المدير التلقائية -->
     <section id="admin-panel">
       <h3><i class="fa-solid fa-sliders"></i> لوحة تحكم الإدارة والتعديل الفوري</h3>
       <br>
@@ -123,7 +126,7 @@
           <input type="hidden" id="edit-product-id">
           <div class="form-group">
             <input type="text" id="prod-title" placeholder="اسم الجهاز">
-            <input type="number" id="prod-price" placeholder="السعر بالدينار العراقي">
+            <input type="number" id="prod-price" placeholder="السعر بالدينار">
             <input type="text" id="prod-img" placeholder="رابط صورة المنتج">
             <select id="prod-category"></select>
             <button id="btn-save-product" onclick="saveProduct()">حفظ المنتج في المتجر</button>
@@ -132,21 +135,25 @@
       </div>
     </section>
 
+    <!-- تصفح الأقسام -->
     <h2 style="margin-bottom: 15px;">أقسام المتجر</h2>
     <div class="categories-bar" id="categories-container">
       <div class="category-chip active" onclick="loadProducts('all')">الكل</div>
     </div>
 
+    <!-- شبكة المنتجات -->
     <h2 style="margin-bottom: 20px;">الأجهزة والملحقات المتاحة</h2>
     <div class="products-grid" id="products-container"></div>
 
+    <!-- السلة والطلبات -->
     <section id="cart-section">
       <h3><i class="fa-solid fa-cart-shopping"></i> سلة المشتريات ووارد الطلبات</h3>
       <div id="cart-items-container" style="margin: 20px 0;"></div>
       
+      <!-- حقل ملاحظات العميل الاختياري -->
       <div id="order-notes-group" class="form-group" style="max-width: 500px; margin-bottom: 15px;">
         <label>ملاحظات إضافية على الطلب (اختياري)</label>
-        <textarea id="order-notes" rows="2" placeholder="مثال: يرجى التوصيل بعد الساعة 4 عصراً، أو تحديد اللون..."></textarea>
+        <textarea id="order-notes" rows="2" placeholder="مثال: يرجى التوصيل بعد الساعة 4 عصراً، أو تحديد اللون المطلوب..."></textarea>
       </div>
 
       <div style="text-align: left;">
@@ -179,9 +186,17 @@
     let currentUserRole = "guest";
     let currentUserCachedData = null;
 
-    // --- 1. التحقق من الحساب والبيانات المطلوبة (الهاتف 11 رقم والعنوان) ---
+    // --- 1. التحقق الصارم والمطور من حساب الجيميل وصحة البيانات المطلوبة عند تسجيل الدخول ---
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        
+        // 🔒 فحص الأمان للتأكد من أن حساب الجيميل تم التحقق من هويته برمز حقيقي من جوجل
+        if (!user.emailVerified) {
+          alert("خطأ أمني: حساب الجيميل هذا غير مؤكد أو وهمي! يرجى الدخول بحساب صحيح مفعل.");
+          await signOut(auth);
+          return;
+        }
+
         currentUser = user;
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
@@ -190,7 +205,7 @@
           currentUserRole = currentUserCachedData.role;
           setupUI(user);
         } else {
-          // إذا سجل بالجيميل لأول مرة، نفتح له النافذة المنبثقة لإدخال الرقم والعنوان
+          // إذا كان حساباً جديداً ومؤكداً من جوجل، نفتح نافذة تفاصيل التوصيل (الهاتف والعنوان)
           document.getElementById("info-modal").style.display = "flex";
         }
       } else {
@@ -203,20 +218,19 @@
       loadProducts('all');
     });
 
-    // حفظ بيانات الهاتف والعنوان بعد التحقق من الشرط (11 رقم)
+    // حفظ بيانات العميل الجديد بعد فحص شرط الـ 11 خانة للرقم العراقي
     window.saveAdditionalInfo = async () => {
       const phone = document.getElementById("user-phone").value.trim();
       const address = document.getElementById("user-address").value.trim();
 
-      // فحص أن الرقم يتكون من 11 خانة ويحتوي على أرقام فقط
       const phoneRegex = /^\d{11}$/;
       if (!phoneRegex.test(phone)) {
-        alert("خطأ: يجب أن يتكون رقم الهاتف من 11 رقماً تماماً!");
+        alert("خطأ: يجب أن يتكون رقم الهاتف من 11 رقماً تماماً وبدون أحرف!");
         return;
       }
 
       if (!address) {
-        alert("خطأ: يرجى كتابة عنوان التوصيل بالتفصيل!");
+        alert("خطأ: يرجى تحديد وعنوان التوصيل بشكل تفصيلي!");
         return;
       }
 
@@ -226,7 +240,7 @@
         displayName: currentUser.displayName,
         phoneNumber: phone,
         address: address,
-        role: "customer" // الرتبة التلقائية للزبائن الجدد
+        role: "customer"
       };
 
       await setDoc(doc(db, "users", currentUser.uid), userData);
@@ -271,7 +285,7 @@
 
     window.logout = () => { signOut(auth); window.location.reload(); };
 
-    // --- 2. أزرار التحكم والإضافة والتعديل للمدير في نفس الصفحة ---
+    // --- 2. التحكم والإضافة والتعديل الفوري للمنتجات والأقسام (للمدير) ---
     async function loadCategories() {
       const snap = await getDocs(collection(db, "categories"));
       const container = document.getElementById("categories-container");
@@ -325,7 +339,7 @@
       window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    // --- 3. عرض وتصفية المنتجات ---
+    // --- 3. عرض وتصفية منتجات المتجر دقة وسلاسة ---
     window.loadProducts = async (catId) => {
       let q = collection(db, "products");
       if(catId !== 'all') q = query(collection(db, "products"), where("categoryId", "==", catId));
@@ -357,21 +371,21 @@
       });
     };
 
-    // --- 4. السلة وإرسال الطلب مع رقم الهاتف والعنوان والملاحظات ---
+    // --- 4. السلة، الطلبات وإرسال تفاصيل الزبون للمدير مبيعات ---
     window.addToCart = async (prodId, title, price) => {
       if(!currentUser) return alert("الرجاء تسجيل الدخول بالجيميل أولاً");
       await addDoc(collection(db, "carts"), {
         userId: currentUser.uid,
         userName: currentUser.displayName,
-        userPhone: currentUserCachedData.phoneNumber,  // يتم إرفاق الهاتف تلقائياً بالطلب
-        userAddress: currentUserCachedData.address,    // يتم إرفاق العنوان تلقائياً بالطلب
+        userPhone: currentUserCachedData.phoneNumber,  
+        userAddress: currentUserCachedData.address,    
         productId: prodId,
         title: title,
         price: price,
         status: "pending",
         notes: ""
       });
-      alert("تمت الإضافة للسلة!");
+      alert("تمت إضافة القطعة إلى سلتك!");
       updateCartCount();
     };
 
@@ -398,7 +412,7 @@
 
       snap.forEach((doc) => {
         const item = doc.data();
-        let adminInfo = (currentUserRole === 'admin') 
+        let adminInfo = (currentUserRole === 'admin' || currentUserRole === 'sales_manager') 
           ? `<div class="cart-details">
                <b>الزبون:</b> ${item.userName} | <b>الهاتف:</b> ${item.userPhone} <br>
                <b>العنوان:</b> ${item.userAddress} <br>
@@ -426,7 +440,6 @@
 
       if(snap.empty) return alert("سلتك خالية من أي منتجات جديدة للتأكيد!");
 
-      // تعديل حالة المنتجات في قاعدة البيانات وإضافة الملاحظات الجانبية للطلب
       for (const item of snap.docs) {
         await updateDoc(doc(db, "carts", item.id), { 
           status: "ordered",
